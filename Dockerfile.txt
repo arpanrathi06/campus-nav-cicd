@@ -1,0 +1,5 @@
+FROM gcc:latest
+WORKDIR /app
+COPY main.cpp .
+RUN g++ -o campus_nav main.cpp
+CMD ["./campus_nav"]

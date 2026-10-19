@@ -1,0 +1,18 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: campus-nav-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: campus-nav
+  template:
+    metadata:
+      labels:
+        app: campus-nav
+    spec:
+      containers:
+      - name: campus-nav
+        image: your-dockerhub-username/campus-nav:latest
+        imagePullPolicy: Always
