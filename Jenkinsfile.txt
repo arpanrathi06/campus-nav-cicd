@@ -1,12 +1,12 @@
 pipeline {
     agent any
     environment {
-        AWS_REGION = 'ap-south-1' // Change to your AWS region
-        AWS_ACCOUNT_ID = 'YOUR_ACTUAL_AWS_ACCOUNT_ID' // Replace with your 12-digit AWS Account ID
+        AWS_REGION = 'ap-south-1' // Your AWS region
+        AWS_ACCOUNT_ID = '404571418135' // Replace with your 12-digit AWS Account ID
         REPO_NAME = 'campus-nav'
         IMAGE_TAG = 'latest'
         ECR_REGISTRY = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
-        DOCKER_IMAGE = "${ECR_REGISTRY}/${REPO_NAME}:${IMAGE_TAG}"
+        IMAGE_URI = "${ECR_REGISTRY}/${REPO_NAME}:${IMAGE_TAG}"
     }
     stages {
         stage('1. Checkout Code') {
@@ -17,20 +17,13 @@ pipeline {
         }
         stage('3. Docker Build') {
             steps {
-                script {
-                    app = docker.build("${env.DOCKER_IMAGE}")
-                }
+                sh "docker build -t ${env.IMAGE_URI} ."
             }
         }
         stage('4. AWS ECR Login & Push') {
             steps {
-                script {
-                    // Authenticate Jenkins with AWS ECR using shell command
-                    sh "aws ecr get-login-password --region ${env.AWS_REGION} | docker login --username AWS --password-stdin ${env.ECR_REGISTRY}"
-                    
-                    // Push image to ECR
-                    app.push("${env.IMAGE_TAG}")
-                }
+                sh "aws ecr get-login-password --region ${env.AWS_REGION} | docker login --username AWS --password-stdin ${env.ECR_REGISTRY}"
+                sh "docker push ${env.IMAGE_URI}"
             }
         }
         stage('5. Minikube Deployment') {
