@@ -28,8 +28,8 @@ pipeline {
         }
         stage('5. Minikube Deployment') {
             steps {
-                sh 'kubectl apply -f k8s/deployment.yaml'
-                sh 'kubectl apply -f k8s/service.yaml'
+                sh 'kubectl apply --validate=false -f k8s/deployment.yaml'
+                sh 'kubectl apply --validate=false -f k8s/service.yaml'
             }
         }
         stage('6. Verification') {
