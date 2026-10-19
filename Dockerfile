@@ -1,5 +1,5 @@
 FROM gcc:latest
 WORKDIR /app
-COPY main.cpp .
+COPY smart.cpp .
 RUN g++ -o campus_nav smart.cpp
 CMD ["./campus_nav"]
