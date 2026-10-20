@@ -26,20 +26,22 @@ pipeline {
                 sh "docker push ${env.IMAGE_URI}"
             }
         }
-       stage('5. Docker Deployment') {
+       stage('5. Minikube Deployment') {
             steps {
-                // Stop and remove any old container if it exists
-                sh 'docker stop campus-nav-app || true'
-                sh 'docker rm campus-nav-app || true'
-                
-                // Run the fresh image from ECR
-                sh 'docker run -d --name campus-nav-app -p 8080:8080 404571418135.dkr.ecr.ap-south-1.amazonaws.com/campus-nav:latest'
+                sh '''
+                    # Apply Kubernetes Deployment and Service manifests
+                    kubectl apply -f k8s/deployment.yaml
+                    kubectl apply -f k8s/service.yaml
+                    
+                    # Force Kubernetes to pull the newest image version from ECR
+                    kubectl rollout restart deployment/campus-nav-deployment
+                '''
             }
         }
         stage('6. Verification') {
             steps {
-                sh 'docker ps'
-                sh 'docker logs campus-nav-app'
+                sh 'kubectl get pods'
+                sh 'kubectl get svc'
             }
         }
     }
